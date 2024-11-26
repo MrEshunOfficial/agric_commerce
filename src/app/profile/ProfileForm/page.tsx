@@ -21,23 +21,17 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppDispatch, RootState } from "@/store";
-import {
-  createUserProfile,
-  fetchUserProfile,
-  updateUserProfile,
-} from "@/store/userProfileSlice";
+import { createUserProfile, updateUserProfile } from "@/store/userProfileSlice";
 import { useRouter } from "next/navigation";
 import {
   defaultValues,
   ProfileFormValues,
   profileSchema,
 } from "@/store/type/profileSchema";
-import { LoadingPageSkeleton } from "@/components/ui/LoadingContent";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
@@ -92,9 +86,6 @@ const ProfileForm: React.FC = () => {
         ...data,
         userId,
       };
-
-      console.log("Sending Profile Data:", profileData); // Add this line
-
       if (profile) {
         await dispatch(updateUserProfile(profileData)).unwrap();
       } else {
@@ -114,14 +105,6 @@ const ProfileForm: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-
-  if (!userId) {
-    return <div>Please sign in to access your profile.</div>;
-  }
-
-  if (loading === "pending") {
-    return <LoadingPageSkeleton />;
-  }
 
   return (
     <Card className="w-full mt-3 border-none">
