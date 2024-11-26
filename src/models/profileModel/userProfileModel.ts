@@ -24,23 +24,8 @@ interface IUserProfile extends Document {
   // Identity card details
   identityCardType?: string;
   identityCardNumber?: string;
-
-  // Fields specific to farmers
-  isFarmer: boolean;
-  farmDetails?: {
-    farmName?: string;
-    location?: string;
-    sizeInAcres?: number;
-    cropsGrown?: string[];
-    livestock?: string[];
-  };
-
-  // Fields specific to buyers
-  isBuyer: boolean;
-  
-
   // Shared and role-specific functionality
-  role: 'Farmer' | 'Buyer' | 'Both';
+  role: 'Farmer' | 'Buyer';
 }
 
 const ProfileSchema = new Schema<IUserProfile>(
@@ -112,25 +97,10 @@ const ProfileSchema = new Schema<IUserProfile>(
       type: String,
       trim: true
     },
-    isFarmer: {
-      type: Boolean,
-      required: true
-    },
-    farmDetails: {
-      farmName: { type: String, trim: true },
-      location: { type: String, trim: true },
-      sizeInAcres: { type: Number },
-      cropsGrown: { type: [String], default: [] },
-      livestock: { type: [String], default: [] }
-    },
-    isBuyer: {
-      type: Boolean,
-      required: true
-    },
    
     role: {
       type: String,
-      enum: ['Farmer', 'Buyer', 'Both'],
+      enum: ['Farmer', 'Buyer'],
       required: true
     },
    

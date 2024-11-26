@@ -22,28 +22,9 @@ export interface IUserProfile {
   // Identity card details
   identityCardType?: string;
   identityCardNumber?: string;
-
-  // Fields specific to farmers
-  isFarmer: boolean;
-  farmDetails?: {
-    farmName?: string;
-    location?: string;
-    sizeInAcres?: number;
-    cropsGrown?: string[];
-    livestock?: string[];
-  };
-
-  // Fields specific to buyers
-  isBuyer: boolean;
-  purchaseHistory?: {
-    productId: string;
-    purchaseDate: Date;
-    quantity: number;
-    price: number;
-  }[];
-
+  
   // Shared and role-specific functionality
-  role: 'Farmer' | 'Buyer' | 'Both';
+  role: 'Farmer' | 'Buyer';
 }
 
 

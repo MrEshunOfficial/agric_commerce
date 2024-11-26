@@ -86,7 +86,7 @@ export default function ProfileNav() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col overflow-y-auto border rounded-lg border-gray-300 dark:border-gray-600 capitalize bg-background">
+    <div className="w-full flex flex-col overflow-y-auto border rounded-lg border-gray-300 dark:border-gray-600 capitalize bg-background">
       {/* Header Section with Cover & Avatar */}
       <div className="relative w-full group">
         <div className="h-24 md:h-32 w-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-lg" />

@@ -11,7 +11,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <UnifiedProfileFetch>
-      <div className="w-full min-h-[calc(78vh-168px)] sm:min-h-[calc(78vh-80px)] relative">
+      <div className="w-full h-[calc(78vh-8px)] sm:h-[calc(78vh-8px)] overflow-auto relative">
         {/* Mobile Nav Toggle */}
         <div className="md:hidden fixed bottom-4 right-4 z-50">
           <Button
@@ -54,7 +54,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   fixed md:relative
                   top-0 left-0
                   h-full md:h-auto
-                  w-3/4 md:w-auto
+                  w-4/5 md:w-auto
                   bg-background
                   z-50 md:z-auto
                   p-4 md:p-0

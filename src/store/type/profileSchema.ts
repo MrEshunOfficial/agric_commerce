@@ -20,37 +20,36 @@ export const profileSchema = z.object({
   phoneNumber: z.string().min(10).max(15),
   country: z.string().min(1, "Country is required"),
   socialMediaLinks: socialMediaLinksSchema,
-  role: z.enum(['Farmer', 'Buyer', 'Both']),
+  role: z.enum(['Farmer', 'Buyer']),
   identityCardType: z.string().optional(),
   identityCardNumber: z.string().optional(),
-  
-  isFarmer: z.boolean(),
-  isBuyer: z.boolean(),
-  farmDetails: z.object({
-    farmName: z.string().optional(),
-    location: z.string().optional(),
-    sizeInAcres: z.number().optional(),
-    cropsGrown: z.array(z.string()).optional(),
-    livestock: z.array(z.string()).optional(),
-  }).optional(),
-}).refine((data) => {
-  // If user is a farmer, validate farm details
-  if (data.isFarmer) {
-    return (
-      data.farmDetails?.farmName &&
-      data.farmDetails?.location &&
-      data.farmDetails?.sizeInAcres !== undefined
-    );
-  }
-  return true;
-}, {
-  message: "Farm details are required when registering as a farmer",
-  path: ["farmDetails"],
-});
+})
 // Export type for TypeScript usage
 export type UserProfileInput = z.infer<typeof profileSchema>;
+export type ProfileFormValues = z.infer<typeof profileSchema>;
 
 // Helper function to validate a profile
 export const validateProfile = (data: unknown) => {
   return profileSchema.parse(data);
+};
+
+export const defaultValues: ProfileFormValues = {
+  userId: "",
+  email: "",
+  fullName: "",
+  username: "",
+  profilePicture: "",
+  bio: "",
+  gender: "Prefer not to say",
+  phoneNumber: "",
+  country: "",
+  socialMediaLinks: {
+    twitter: null,
+    facebook: null,
+    instagram: null,
+    linkedIn: null,
+  },
+  identityCardType: "",
+  identityCardNumber: "",
+  role: "Buyer",
 };

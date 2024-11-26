@@ -16,6 +16,7 @@ import {
   Phone,
   Info,
   DivideIcon,
+  Tractor,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -204,6 +205,15 @@ export default function MainHeader() {
                         <Phone size={18} />
                         <span>Contact Us</span>
                       </Link>
+                      {profile?.role === "Farmer" && (
+                        <Link
+                          href="/profile/farm-details"
+                          className="p-2 hover:bg-secondary transition-colors flex items-center justify-start gap-3 mt-1"
+                        >
+                          <Tractor size={18} />
+                          <span>Farm details</span>
+                        </Link>
+                      )}
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -336,6 +346,15 @@ export default function MainHeader() {
                         <Phone size={18} />
                         <span>Contact Us</span>
                       </Link>
+                      {profile?.role === "Farmer" && (
+                        <Link
+                          href="/profile/farm-details"
+                          className="p-2 hover:bg-secondary transition-colors flex items-center justify-start gap-3 mt-1"
+                        >
+                          <Tractor size={18} />
+                          <span>Farm details</span>
+                        </Link>
+                      )}
                       <div className="p-2 hover:bg-secondary transition-colors flex items-center justify-start gap-3">
                         <Popover>
                           <PopoverTrigger className="w-full hover:bg-secondary transition-colors flex items-center justify-start gap-1 p-0 -pl-3">
