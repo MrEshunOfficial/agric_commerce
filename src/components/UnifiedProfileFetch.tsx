@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { ErrorState } from "@/components/ui/LoadingContent";
 import { Loader2 } from "lucide-react";
+import { fetchFarmProfiles } from "@/store/farmSlice";
+// import { fetchFarmProfiles } from "@/store/farmSlice";
 
 interface UnifiedFetchProps {
   children: React.ReactNode;
@@ -28,7 +30,10 @@ const UnifiedProfileFetch: React.FC<UnifiedFetchProps> = ({ children }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await Promise.all([dispatch(fetchUserProfile())]);
+        await Promise.all([
+          dispatch(fetchUserProfile()),
+          dispatch(fetchFarmProfiles()),
+        ]);
       } catch (err) {
         toast({
           title: "System Error",
@@ -47,13 +52,9 @@ const UnifiedProfileFetch: React.FC<UnifiedFetchProps> = ({ children }) => {
 
   if (loading === "pending") {
     return (
-      <div className="w-full h-[75vh] flex flex-col gap-4 items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-600 dark:from-gray-800 dark:to-black p-4">
-        <div className="bg-white/20 dark:bg-gray-800/50 backdrop-blur-lg rounded-lg p-6 shadow-lg flex flex-col items-center gap-2">
-          <Loader2 className="animate-spin text-blue-200 dark:text-blue-500 w-12 h-12" />
-          <span className="text-lg font-semibold text-white dark:text-gray-300 animate-pulse">
-            Loading...
-          </span>
-        </div>
+      <div className="w-full h-[75vh] flex gap-4 items-center justify-center p-4">
+        <Loader2 className="animate-spin" size={20} />
+        <span className="text-lg font-semibold animate-pulse">Loading...</span>
       </div>
     );
   }

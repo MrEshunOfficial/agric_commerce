@@ -59,7 +59,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error }) => {
     <div className="w-full h-full flex flex-col items-center justify-center p-8">
       <Alert
         variant="destructive"
-        className="mb-6 max-w-md dark:bg-red-900 text-white dark:border-red-700"
+        className="mb-6 max-w-md border dark:bg-red-900 dark:text-white border-red-700"
       >
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>

@@ -86,7 +86,7 @@ export default function ProfileNav() {
   };
 
   return (
-    <div className="w-full flex flex-col overflow-y-auto border rounded-lg border-gray-300 dark:border-gray-600 capitalize bg-background">
+    <div className="w-full flex flex-col overflow-y-auto border rounded-lg border-gray-300 dark:border-gray-600 capitalize">
       {/* Header Section with Cover & Avatar */}
       <div className="relative w-full group">
         <div className="h-24 md:h-32 w-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-lg" />
@@ -131,18 +131,6 @@ export default function ProfileNav() {
           <p className="text-sm text-gray-600 dark:text-gray-400 capitalize">
             @{profile?.username}
           </p>
-        </div>
-
-        <div className="text-sm text-gray-700 dark:text-gray-300 text-center">
-          <Button variant="ghost">
-            {session && profile ? (
-              <Link href="/profile/ProfileForm">Edit Profile</Link>
-            ) : session && !profile ? (
-              "no profile"
-            ) : (
-              <Link href="/authclient/Login">Sign In</Link>
-            )}
-          </Button>
         </div>
 
         {/* Stats Card */}

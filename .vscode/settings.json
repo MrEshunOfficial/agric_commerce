@@ -1,6 +1,7 @@
 {
   "files.autoSave": "afterDelay",
   "cSpell.words": [
+    "autoplay",
     "autotable",
     "clsx",
     "datepicker",
@@ -8,6 +9,8 @@
     "daygrid",
     "embla",
     "Eventmodel",
+    "farmdataapi",
+    "formtypes",
     "hookform",
     "immer",
     "jspdf",

@@ -417,7 +417,7 @@ const ProfileForm: React.FC = () => {
                     Saving...
                   </>
                 ) : (
-                  "Save Profile"
+                  "Add Farm"
                 )}
               </Button>
             </div>

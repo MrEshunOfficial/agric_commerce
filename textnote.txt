@@ -1,0 +1,27 @@
+// form data for creating a farm profile
+1. Farm Information
+* Name of farm
+* Farm Location
+* Nearby Landmarks
+* GPS Address of the location
+* Size of the Farm (acres)
+* Production Scale (commercial, medium, small)
+* image of farm
+
+2. Farmer Owner Information
+* Ownership Status (Owned, Leased, Rented, Communal)
+* Full Name
+* Contact Information (Phone, Email)
+* Gender
+
+3. Farm Type
+* Type of Farming (Crop Farming, Livestock Farming, Mixed, Aquaculture)
+* Type of crop farming (mixed, arable, horticulture, perennial and Hydroponic)
+* type of Livestock (mixed, diary, poultry, cattle ranching, Pig farming, Beekeeping)
+* Primary Crops or Livestock Species
+
+4. groups and corporate Information
+* Is this farm registered with any group or Cooperatives? yes or no.
+* Name of the Group
+* Name and contact of one group executive, President or secretary.
+* Name and contact of the Nearest Agric. Officer.

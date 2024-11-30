@@ -1,10 +1,12 @@
 // store/store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import userProfileReducer from "./userProfileSlice";
+import farmProfileReducer from "./farmSlice";
 
 export const store = configureStore({
   reducer: {
     userProfile: userProfileReducer,
+    farmProfiles: farmProfileReducer,
   },
 });
 
