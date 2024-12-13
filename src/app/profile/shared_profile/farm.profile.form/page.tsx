@@ -36,9 +36,7 @@ type FarmProfileFormProps = {
   setIsFormActive: (isActive: boolean) => void;
 };
 
-const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
-  setIsFormActive,
-}) => {
+const Page: React.FC<FarmProfileFormProps> = ({ setIsFormActive }) => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
@@ -380,4 +378,4 @@ function getSectionTitle(section: number) {
   return titles[section - 1];
 }
 
-export default FarmProfileForm;
+export default Page;
