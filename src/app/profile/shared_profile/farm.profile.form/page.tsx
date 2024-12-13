@@ -32,14 +32,10 @@ import {
   ProductionScale,
 } from "@/store/type/formtypes";
 
-interface Props {
-  setIsFormActive: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const FarmProfileForm = ({ setIsFormActive }: Props) => {
+const FarmProfileForm = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
-
+  const [isFormActive, setIsFormActive] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const { currentProfile, loading, error } = useSelector(
     (state: RootState) => state.farmProfiles
