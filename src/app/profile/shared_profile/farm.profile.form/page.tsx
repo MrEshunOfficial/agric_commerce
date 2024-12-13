@@ -32,11 +32,11 @@ import {
   ProductionScale,
 } from "@/store/type/formtypes";
 
-type FarmProfileFormProps = {
-  setIsFormActive: (isActive: boolean) => void;
-};
+interface Props {
+  setIsFormActive: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const Page: React.FC<FarmProfileFormProps> = ({ setIsFormActive }) => {
+const FarmProfileForm = ({ setIsFormActive }: Props) => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
@@ -378,4 +378,4 @@ function getSectionTitle(section: number) {
   return titles[section - 1];
 }
 
-export default Page;
+export default FarmProfileForm;
