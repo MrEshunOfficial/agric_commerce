@@ -32,10 +32,16 @@ import {
   ProductionScale,
 } from "@/store/type/formtypes";
 
-const FarmProfileForm = () => {
+type FarmProfileFormProps = {
+  setIsFormActive: (isActive: boolean) => void;
+};
+
+const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
+  setIsFormActive,
+}) => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  const [isFormActive, setIsFormActive] = useState(true);
+
   const dispatch = useDispatch<AppDispatch>();
   const { currentProfile, loading, error } = useSelector(
     (state: RootState) => state.farmProfiles

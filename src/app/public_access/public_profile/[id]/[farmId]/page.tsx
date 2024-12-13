@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
@@ -22,30 +22,31 @@ import FarmInformationDetails from "@/app/profile/shared_profile/farm.list.compo
 import FarmerInformationDetails from "@/app/profile/shared_profile/farm.list.components/FarmerOwnerInformationList";
 import CooperativeDetails from "@/app/profile/shared_profile/farm.list.components/CooperativeDetails";
 
-interface FarmDetailsPageProps {
-  farmId?: string; // Optional prop to allow passing farmId directly
-}
-
-const FarmDetailsPage: React.FC<FarmDetailsPageProps> = ({
-  farmId: propFarmId,
-}) => {
+// Remove the props type and use Next.js page component params
+export default function FarmDetailsPage({
+  params,
+}: {
+  params: {
+    id: string;
+    farmId: string;
+  };
+}) {
   const dispatch = useDispatch<AppDispatch>();
-  const params = useParams();
 
-  // Prioritize prop farmId, fallback to params, with type safety
-  const farmId = propFarmId ?? (params?.farmId as string);
+  // Use params.farmId directly
+  const farmId = params.farmId;
 
   const { farmProfiles, currentProfile, loading } = useSelector(
     (state: RootState) => state.farmProfiles
   );
 
   // Fetch farm profiles on component mount
-  useEffect(() => {
+  React.useEffect(() => {
     dispatch(fetchFarmProfiles({}));
   }, [dispatch]);
 
   // Fetch specific farm profile when farmId changes
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchProfiles = async () => {
       if (!farmId) {
         toast({
@@ -71,7 +72,7 @@ const FarmDetailsPage: React.FC<FarmDetailsPageProps> = ({
   }, [dispatch, farmId]);
 
   // Set current profile based on fetched profiles
-  useEffect(() => {
+  React.useEffect(() => {
     if (farmProfiles.length > 0 && farmId) {
       const profile = farmProfiles.find((profile) => profile._id === farmId);
       if (profile) {
@@ -226,6 +227,4 @@ const FarmDetailsPage: React.FC<FarmDetailsPageProps> = ({
       <Toaster />
     </motion.div>
   );
-};
-
-export default FarmDetailsPage;
+}

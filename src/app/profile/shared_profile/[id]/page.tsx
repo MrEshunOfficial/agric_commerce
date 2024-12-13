@@ -342,7 +342,7 @@ export default function FarmDetailsPage() {
                         </TabsContent>
                       </motion.div>
                     ) : (
-                      <FarmProfileForm />
+                      <FarmProfileForm setIsFormActive={setIsFormActive} />
                     )}
                   </Tabs>
                 </div>
