@@ -60,22 +60,31 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET: Retrieve all farm profiles for the authenticated user
+// GET: Retrieve farm profiles 
 export async function GET(req: NextRequest) {
   try {
     // Ensure database connection
     await connect();
     
-    // Authenticate the user
+    // Check if a specific user ID is requested in the query parameters
+    const { searchParams } = new URL(req.url);
+    const specificUserId = searchParams.get('userId');
+
+    // Authenticate the session (optional, depends on your authorization requirements)
     const session = await auth();
-    const userId = session?.user?.id;
-   
-    if (!userId) {
+    const currentUserId = session?.user?.id;
+
+    // Determine query conditions
+    const queryConditions = specificUserId 
+      ? { userId: specificUserId }
+      : {}; 
+
+    if (!specificUserId && !currentUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch all farm profiles for the user
-    const farmProfiles = await FarmProfile.find({ userId }).select('-__v').lean();
+    // Fetch farm profiles based on conditions
+    const farmProfiles = await FarmProfile.find(queryConditions).select('-__v').lean();
 
     return NextResponse.json(
       { 

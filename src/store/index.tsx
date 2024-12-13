@@ -2,11 +2,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userProfileReducer from "./userProfileSlice";
 import farmProfileReducer from "./farmSlice";
+import postDataReducer from "./postSlice";
 
 export const store = configureStore({
   reducer: {
     userProfile: userProfileReducer,
     farmProfiles: farmProfileReducer,
+    posts: postDataReducer,
   },
 });
 

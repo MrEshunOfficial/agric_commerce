@@ -25,11 +25,14 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     const userEmail = session?.user?.email;
     const userId = session?.user?.id;
+
     if (!userEmail || !userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
     const data = await req.json();
     const validatedData = profileSchema.parse(data);
+    
     await connect();
     const existingProfile = await UserProfile.findOne({ userId });
     if (existingProfile) {
@@ -44,7 +47,7 @@ export async function POST(req: NextRequest) {
 }
 
 // GET: Retrieve user profile
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await auth();
     const userId = session?.user?.id;
@@ -52,15 +55,29 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     await connect();
-    const userProfile = await UserProfile.findOne({ userId }).select('-__v');
-    if (!userProfile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+
+    // Check if there's a query parameter for a specific user
+    const { searchParams } = new URL(request.url);
+    const specificUserId = searchParams.get('userId');
+
+    if (specificUserId) {
+      // Fetch profile for a specific user
+      const userProfile = await UserProfile.findOne({ userId: specificUserId }).select('-__v');
+      if (!userProfile) {
+        return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+      }
+      return NextResponse.json(userProfile, { status: 200 });
+    } else {
+      // Fetch all profiles
+      const userProfiles = await UserProfile.find().select('-__v');
+      return NextResponse.json(userProfiles, { status: 200 });
     }
-    return NextResponse.json(userProfile, { status: 200 });
   } catch (error) {
     return handleError(error);
   }
 }
+
+
 
 // PUT: Update existing profile
 export async function PUT(req: NextRequest) {

@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+export const RatingSchema = z.object({
+  farmer_rating: z.number().min(0, 'Rating cannot be negative').max(5, 'Rating cannot exceed 5'),
+  review: z.string().optional(),
+});
 // Social Media Links Schema
 const socialMediaLinksSchema = z.object({
   twitter: z.string().url("Invalid Twitter URL").nullable().optional(),
@@ -23,6 +27,8 @@ export const profileSchema = z.object({
   role: z.enum(['Farmer', 'Buyer']),
   identityCardType: z.string().optional(),
   identityCardNumber: z.string().optional(),
+  RatingSchema: RatingSchema.optional(),
+  verified: z.boolean(),
 })
 // Export type for TypeScript usage
 export type UserProfileInput = z.infer<typeof profileSchema>;
@@ -52,4 +58,9 @@ export const defaultValues: ProfileFormValues = {
   identityCardType: "",
   identityCardNumber: "",
   role: "Buyer",
+  RatingSchema: {
+    farmer_rating: 0,
+    review: "",
+  },
+  verified:false
 };

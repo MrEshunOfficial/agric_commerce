@@ -1,6 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { FarmProfileData, validateFarmProfileForm } from './type/formtypes';
+import { 
+  FarmProfileData, 
+  FarmProfileFormSchema 
+} from './type/formtypes';
 
 // Initial State Interface
 interface FarmProfileState {
@@ -18,70 +21,123 @@ const initialState: FarmProfileState = {
   error: null
 };
 
-function generateUniqueId(): string {
-  return `farm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+// Async Thunks for API Interactions
+interface FetchFarmProfilesParams {
+  userId?: string;
 }
 
-// Async Thunks for API Interactions
-export const fetchFarmProfiles = createAsyncThunk(
+export const fetchFarmProfiles = createAsyncThunk<
+  FarmProfileData[], 
+  FetchFarmProfilesParams, 
+  { rejectValue: string }
+>(
   'farmProfiles/fetchFarmProfiles',
-  async (_, { rejectWithValue }) => {
+  async (params: FetchFarmProfilesParams = {}, { rejectWithValue }) => {
     try {
-      const response = await axios.get('/api/farmdataapi');
-      // Verify data structure
+      const url = params.userId 
+        ? `/api/farmdataapi?userId=${params.userId}`
+        : '/api/farmdataapi';
+
+      const response = await axios.get<{ farmProfiles: FarmProfileData[] }>(url);
+      
       if (!response.data || !response.data.farmProfiles) {
         return rejectWithValue('Invalid response structure');
       }
-      // Validate each profile in the farmProfiles array
-      const validatedProfiles = response.data.farmProfiles.map((profile: unknown) => 
-        validateFarmProfileForm(profile)
-      );
       
-      return validatedProfiles;
+      return response.data.farmProfiles;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data || 'Error fetching farm profiles');
+        return rejectWithValue(
+          error.response?.data || 'Error fetching farm profiles'
+        );
       }
       return rejectWithValue('An unknown error occurred');
     }
   }
 );
 
-export const createFarmProfile = createAsyncThunk(
-  'farmProfiles/createFarmProfile',
-  async (profileData: FarmProfileData, { rejectWithValue }) => {
+export const fetchFarmProfileById = createAsyncThunk<
+  FarmProfileData, 
+  string, 
+  { rejectValue: string }
+>(
+  'farmProfiles/fetchFarmProfileById',
+  async (id: string, { rejectWithValue }) => {
     try {
-      const validatedProfile = validateFarmProfileForm(profileData);
-      const response = await axios.post('/api/farmdataapi', validatedProfile);
+      const response = await axios.get<FarmProfileData>(`/api/farmdataapi/${id}`);
       
-      // Ensure the response includes an _id
-      if (!response.data._id) {
-        console.warn('Created profile is missing _id');
-        response.data._id = generateUniqueId(); // Fallback ID generation
+      if (!response.data) {
+        return rejectWithValue('No farm profile found');
       }
       
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data || 'Error creating farm profile');
+        if (error.response?.status === 404) {
+          return rejectWithValue('Farm profile not found');
+        }
+        
+        return rejectWithValue(
+          error.response?.data?.message || 
+          'Error fetching farm profile by ID'
+        );
+      }
+      return rejectWithValue('An unexpected error occurred');
+    }
+  }
+);
+
+export const createFarmProfile = createAsyncThunk<
+  FarmProfileData, 
+  FarmProfileData, 
+  { rejectValue: string }
+>(
+  'farmProfiles/createFarmProfile',
+  async (profileData: FarmProfileData, { rejectWithValue }) => {
+    try {
+      // Validate input using Zod schema before sending
+      const validationResult = FarmProfileFormSchema.safeParse(profileData);
+      
+      if (!validationResult.success) {
+        return rejectWithValue(
+          validationResult.error.errors.map(err => err.message).join(', ')
+        );
+      }
+
+      const response = await axios.post<FarmProfileData>('/api/farmdataapi', profileData); 
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        return rejectWithValue(
+          error.response?.data || 'Error creating farm profile'
+        );
       }
       return rejectWithValue('An unknown error occurred');
     }
   }
 );
 
-
-export const updateFarmProfile = createAsyncThunk(
+export const updateFarmProfile = createAsyncThunk<
+  FarmProfileData, 
+  { id: string, profileData: Partial<FarmProfileData> }, 
+  { rejectValue: string }
+>(
   'farmProfiles/updateFarmProfile',
-  async ({ id, profileData }: { id: string, profileData: Partial<FarmProfileData> }, { rejectWithValue }) => {
+  async ({ id, profileData }, { rejectWithValue }) => {
     try {
-      // Validate the profile data before sending
-      const validatedProfile = validateFarmProfileForm({
-        ...profileData    // Overwrite with new data
-      });
-
-      const response = await axios.put(`/api/farmdataapi/${id}`, validatedProfile);
-      return response.data; // Adjust based on your actual API response structure
+      // Validate partial update using Zod schema
+      const validationResult = FarmProfileFormSchema.safeParse(profileData);
+      
+      if (!validationResult.success) {
+        return rejectWithValue(
+          validationResult.error.errors.map((err: any) => err.message).join(', ')
+        );
+      }
+      const response = await axios.put<FarmProfileData>(
+        `/api/farmdataapi/${id}`, 
+        profileData
+      );
+      return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error('Update Error Details:', {
@@ -100,14 +156,17 @@ export const updateFarmProfile = createAsyncThunk(
   }
 );
 
-export const deleteFarmProfile = createAsyncThunk(
+export const deleteFarmProfile = createAsyncThunk<
+  string, 
+  string, 
+  { rejectValue: string }
+>(
   'farmProfiles/deleteFarmProfile',
   async (id: string, { rejectWithValue }) => {
     try {
       console.log('Attempting to delete profile with ID:', id);
       const response = await axios.delete(`/api/farmdataapi/${id}`);
       
-      // Add more detailed error handling
       if (response.status !== 200) {
         console.error('Unexpected response status:', response.status);
         return rejectWithValue(`Unexpected status code: ${response.status}`);
@@ -124,7 +183,6 @@ export const deleteFarmProfile = createAsyncThunk(
           headers: error.response?.headers
         });
         
-        // More specific error handling
         if (error.response?.status === 404) {
           return rejectWithValue('Farm profile not found. It may have been already deleted or the ID is incorrect.');
         }
@@ -151,95 +209,100 @@ const farmProfileSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    setCurrentProfile: (state, action) => {
+    setCurrentProfile: (state, action: PayloadAction<FarmProfileData>) => {
       state.currentProfile = action.payload;
     }
   },
   extraReducers: (builder) => {
-    // Fetch All Profiles
-    builder.addCase(fetchFarmProfiles.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchFarmProfiles.fulfilled, (state, action) => {
-      state.loading = false;
-      state.farmProfiles = action.payload;
-    });
-    builder.addCase(fetchFarmProfiles.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
-
-    // Create Farm Profile
-    builder.addCase(createFarmProfile.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-   // In createFarmProfile reducer
-    builder.addCase(createFarmProfile.fulfilled, (state, action) => {
-      state.loading = false;
-      // Ensure the new profile has an _id
-      const newProfile = action.payload;
-      if (newProfile && !newProfile._id) {
-        newProfile._id = newProfile._id || generateUniqueId(); // Add a fallback ID generation
-      }
-      state.farmProfiles.push(newProfile);
-      state.currentProfile = newProfile;
-    });
-    builder.addCase(createFarmProfile.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
-
-    // Update Farm Profile
-    builder.addCase(updateFarmProfile.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(updateFarmProfile.fulfilled, (state, action) => {
-      state.loading = false;
-      const index = state.farmProfiles.findIndex(profile => 
-        profile.farmName === action.payload.farmName
-      );
-      if (index !== -1) {
-        state.farmProfiles[index] = action.payload;
-      }
-      state.currentProfile = action.payload;
-    });
-    builder.addCase(updateFarmProfile.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
-
-    // Delete Farm Profile
-    builder.addCase(deleteFarmProfile.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(deleteFarmProfile.fulfilled, (state, action) => {
-      state.loading = false;
-      // Filter out the profile with the matching _id
-      state.farmProfiles = state.farmProfiles.filter(profile => 
-        profile._id !== action.payload
-      );
+    builder
+      // Fetch Farm Profiles
+      .addCase(fetchFarmProfiles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchFarmProfiles.fulfilled, (state, action) => {
+        state.loading = false;
+        state.farmProfiles = action.payload;
+      })
+      .addCase(fetchFarmProfiles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error fetching farm profiles';
+      })
       
-      // If the current profile was deleted, clear it
-      if (state.currentProfile && state.currentProfile._id === action.payload) {
-        state.currentProfile = null;
-      }
+      // Create Farm Profile
+      .addCase(createFarmProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createFarmProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        
+        // Ensure the new profile has an _id
+        const newProfile = action.payload;
+        if (newProfile && !newProfile._id) {
+          newProfile._id;
+        }
+        
+        state.farmProfiles.push(newProfile);
+        state.currentProfile = newProfile;
+      })
+      .addCase(createFarmProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error creating farm profile';
+      })
       
-      // If there are remaining profiles, select the last one
-      if (state.farmProfiles.length > 0) {
-        state.currentProfile = state.farmProfiles[state.farmProfiles.length - 1];
-      }
-    });
-    builder.addCase(deleteFarmProfile.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload as string;
-    });
+      // Update Farm Profile
+      .addCase(updateFarmProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateFarmProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.farmProfiles.findIndex(profile => 
+          profile._id === action.payload._id
+        );
+        
+        if (index !== -1) {
+          state.farmProfiles[index] = action.payload;
+        }
+        
+        state.currentProfile = action.payload;
+      })
+      .addCase(updateFarmProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error updating farm profile';
+      })
+      
+      // Delete Farm Profile
+      .addCase(deleteFarmProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteFarmProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.farmProfiles = state.farmProfiles.filter(profile => 
+          profile._id !== action.payload
+        );
+        
+        if (state.currentProfile && state.currentProfile._id === action.payload) {
+          state.currentProfile = null;
+        }
+        
+        if (state.farmProfiles.length > 0) {
+          state.currentProfile = state.farmProfiles[state.farmProfiles.length - 1];
+        }
+      })
+      .addCase(deleteFarmProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Error deleting farm profile';
+      });
   }
 });
 
-// Export actions and reducer
-export const { clearCurrentProfile, clearError, setCurrentProfile } = farmProfileSlice.actions;
+export const { 
+  clearCurrentProfile, 
+  clearError, 
+  setCurrentProfile 
+} = farmProfileSlice.actions;
+
 export default farmProfileSlice.reducer;

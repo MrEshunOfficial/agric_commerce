@@ -13,24 +13,10 @@ const FarmType = {
   CropFarming: 'Crop Farming',
   LivestockFarming: 'Livestock Farming',
   Mixed: 'Mixed',
-  Aquaculture: 'Aquaculture'
-} as const;
-
-const CropFarmingType = {
-  Mixed: 'Mixed',
-  Arable: 'Arable', 
-  Horticulture: 'Horticulture',
-  Perennial: 'Perennial',
-  Hydroponic: 'Hydroponic'
-} as const;
-
-const LivestockType = {
-  Mixed: 'Mixed',
-  Dairy: 'Dairy',
+  Aquaculture: 'Aquaculture',
+  Nursery: 'Nursery',
   Poultry: 'Poultry',
-  CattleRanching: 'Cattle Ranching',
-  PigFarming: 'Pig Farming',
-  Beekeeping: 'Beekeeping'
+  Others: 'Others',
 } as const;
 
 const ProductionScale = {
@@ -50,7 +36,6 @@ const Gender = {
 export interface IFarmProfile extends Document {
   _id: string;
   userId: string;
-  // 1. Farm Information
   farmName: string;
   farmLocation: string;
   nearbyLandmarks?: string[];
@@ -71,9 +56,13 @@ export interface IFarmProfile extends Document {
 
   // 3. Farm Type
   farmType: typeof FarmType[keyof typeof FarmType];
-  cropFarmingType?: typeof CropFarmingType[keyof typeof CropFarmingType];
-  livestockType?: typeof LivestockType[keyof typeof LivestockType];
-  primaryCropsOrLivestock: string[];
+  cropsGrown?: string[];
+  livestockProduced?: string[];
+  mixedCropsGrown?: string[];
+  aquacultureType?: string[];
+  nurseryType?: string[];
+  poultryType?: string[];
+  othersType?: string[];
 
   // 4. Groups and Cooperative Information
   belongsToCooperative: boolean;
@@ -186,23 +175,34 @@ const FarmProfileSchema: Schema<IFarmProfile> = new mongoose.Schema({
     required: true,
     enum: Object.values(FarmType)
   },
-  cropFarmingType: {
+  cropsGrown: [{
     type: String,
-    enum: Object.values(CropFarmingType)
-  },
-  livestockType: {
+    trim: true
+  }],
+  livestockProduced: [{
     type: String,
-    enum: Object.values(LivestockType)
-  },
-  primaryCropsOrLivestock: {
-    type: [String],
-    required: true,
-    validate: {
-      validator: (v: string[]) => v.length > 0,
-      message: 'At least one crop or livestock type must be specified'
-    }
-  },
-
+    trim: true
+  }],
+  mixedCropsGrown: [{
+    type: String,
+    trim: true
+  }],
+  aquacultureType: [{
+    type: String,
+    trim: true
+  }],
+  nurseryType: [{
+    type: String,
+    trim: true
+  }],
+  poultryType: [{
+    type: String,
+    trim: true
+  }],
+  othersType: [{
+    type: String,
+    trim: true
+  }],
   // 4. Groups and Cooperative Information
   belongsToCooperative: {
     type: Boolean,
@@ -256,40 +256,7 @@ const FarmProfileSchema: Schema<IFarmProfile> = new mongoose.Schema({
       }
     }
   }
-}, {
-  timestamps: true,
-  // Add pre-save validation hooks to mimic Zod's complex validations
-  validate: {
-    validator: function(this: IFarmProfile) {
-      // Cooperative Information Validation
-      if (this.belongsToCooperative) {
-        if (!this.cooperativeName) {
-          return false;
-        }
-        if (!this.cooperativeExecutive) {
-          return false;
-        }
-      }
-
-      // Farm Type Specific Validations
-      if (this.farmType === "Crop Farming" && !this.cropFarmingType) {
-        return false;
-      }
-
-      if (this.farmType === "Livestock Farming" && !this.livestockType) {
-        return false;
-      }
-
-      // Contact Information Validation
-      if (!this.contactPhone && !this.contactEmail) {
-        return false;
-      }
-
-      return true;
-    },
-    message: 'Validation failed'
-  }
-});
+}, {timestamps: true});
 
 // Create the model
 const FarmProfile = mongoose.models.FarmProfile || mongoose.model<IFarmProfile>('FarmProfile', FarmProfileSchema);

@@ -49,7 +49,7 @@ export default function RootLayout({
                 </header>
 
                 {/* Main content with padding-top on mobile to account for fixed header */}
-                <section className="container flex-1 mt-2 sm:mt-2 h-[calc(80vh-theme(spacing.24))] sm:h-[calc(80vh-theme(spacing.28))] overflow-auto flex items-center justify-center">
+                <section className="w-full flex-1 mt-2 sm:mt-2 h-[calc(80vh-theme(spacing.24))] sm:h-[calc(80vh-theme(spacing.28))] overflow-auto flex items-center justify-center">
                   {children}
                 </section>
               </main>

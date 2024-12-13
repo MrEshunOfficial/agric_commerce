@@ -15,8 +15,8 @@ import {
   Laptop,
   Phone,
   Info,
-  DivideIcon,
   Tractor,
+  HomeIcon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -167,6 +167,7 @@ export default function MainHeader() {
           <div className="hidden md:flex items-center justify-center gap-2 lg:gap-3 flex-1 px-4 lg:px-8">
             <TooltipProvider>
               <div className="flex items-center gap-1 lg:gap-3">
+                <IconButton icon={HomeIcon} label="Home" href="/" />
                 <IconButton
                   icon={ShoppingCart}
                   label="Saved Products"
@@ -205,15 +206,6 @@ export default function MainHeader() {
                         <Phone size={18} />
                         <span>Contact Us</span>
                       </Link>
-                      {profile?.role === "Farmer" && (
-                        <Link
-                          href="/profile/farm-details"
-                          className="p-2 hover:bg-secondary transition-colors flex items-center justify-start gap-3 mt-1"
-                        >
-                          <Tractor size={18} />
-                          <span>Farm details</span>
-                        </Link>
-                      )}
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -245,7 +237,7 @@ export default function MainHeader() {
                   <PopoverContent className="min-w-60 rounded-2xl p-1">
                     <div className="flex flex-col text-sm gap-3">
                       <Link
-                        href={"/profile"}
+                        href={"/profile/shared_profile"}
                         className="p-2 hover:bg-secondary hover:rounded-lg transition-colors flex items-center justify-start gap-3 pb-3 border-b-2"
                       >
                         <Avatar className="h-10 w-10 border border-border rounded-full shadow-md">

@@ -1,7 +1,14 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
+// add rating document
+
+interface RatingsDocument extends Document {
+  farmer_rating: number;
+  review: string;
+  createdAt: Date;
+}
 // Interface for the UserProfile document
-interface IUserProfile extends Document {
+export interface IUserProfile extends Document {
   _id: string;
   userId: string;
   email: string;
@@ -20,13 +27,23 @@ interface IUserProfile extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  verified?: boolean;
+  ratings?: RatingsDocument;
 
   // Identity card details
   identityCardType?: string;
   identityCardNumber?: string;
-  // Shared and role-specific functionality
   role: 'Farmer' | 'Buyer';
 }
+
+const RatingsSchema = new Schema<RatingsDocument>({
+  farmer_rating: { 
+    type: Number, 
+    min: [0, 'Rating cannot be negative'],
+    max: [5, 'Rating cannot exceed 5']
+  },
+  review: String
+});
 
 const ProfileSchema = new Schema<IUserProfile>(
   {
@@ -103,6 +120,14 @@ const ProfileSchema = new Schema<IUserProfile>(
       enum: ['Farmer', 'Buyer'],
       required: true
     },
+    verified: {
+      type: Boolean,
+      default: false
+    },
+    ratings:[ {
+      type: RatingsSchema,
+      required: false
+    }],
    
   },
   {

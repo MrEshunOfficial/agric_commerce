@@ -66,7 +66,6 @@ const ProfileForm: React.FC = () => {
     setValue("fullName", fullName || "");
     setValue("email", userMail || "");
 
-    // Then, if there's an existing profile, populate all fields
     if (profile) {
       Object.entries(profile).forEach(([key, value]) => {
         if (key !== "email" && key !== "fullName") {
@@ -91,11 +90,11 @@ const ProfileForm: React.FC = () => {
       } else {
         await dispatch(createUserProfile(profileData)).unwrap();
       }
-      router.push("/profile");
       toast({
         title: "Profile Saved",
         description: "Your profile has been successfully saved.",
       });
+      router.push("/profile/shared_profile");
     } catch (error) {
       toast({
         title: "Failed to Save Profile",
@@ -417,7 +416,7 @@ const ProfileForm: React.FC = () => {
                     Saving...
                   </>
                 ) : (
-                  "Add Farm"
+                  "Create Profile"
                 )}
               </Button>
             </div>

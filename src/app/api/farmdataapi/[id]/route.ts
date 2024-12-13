@@ -53,30 +53,20 @@ export async function PUT(
   }
 }
 
-// GET: Retrieve a specific farm profile
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
-    
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     await connect();
-    
-    const event = await FarmProfile.findOne({
-      _id: params.id,
-      userId: session.user.id
-    });
 
-    if (!event) {
-      return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    const farmProfile = await FarmProfile.findById(params.id);
+
+    if (!farmProfile) {
+      return NextResponse.json({ error: 'Farm profile not found' }, { status: 404 });
     }
 
-    return NextResponse.json(event);
+    return NextResponse.json(farmProfile);
   } catch (error) {
     return handleError(error);
   }

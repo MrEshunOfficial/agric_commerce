@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
@@ -17,21 +18,27 @@ import { useSession } from "next-auth/react";
 
 // Import actions and types
 import { createFarmProfile, updateFarmProfile } from "@/store/farmSlice";
+import { Toaster } from "@/components/ui/toaster";
+import FarmInformationSection from "../farm.forms.components/FarmInformationSection";
+import FarmerOwnerInformationSection from "../farm.forms.components/FarmerOwnerInformationSection";
+import FarmTypeSection from "../farm.forms.components/FarmTypeSection";
+import CooperativeInformationSection from "../farm.forms.components/CooperativeInformationSection";
+import { useRouter } from "next/navigation";
 import {
-  CropFarmingType,
   FarmProfileData,
   FarmType,
   Gender,
   OwnershipStatus,
   ProductionScale,
 } from "@/store/type/formtypes";
-import FarmInformationSection from "./farm.forms.components/FarmInformationSection";
-import FarmerOwnerInformationSection from "./farm.forms.components/FarmerOwnerInformationSection";
-import FarmTypeSection from "./farm.forms.components/FarmTypeSection";
-import CooperativeInformationSection from "./farm.forms.components/CooperativeInformationSection";
-import { Toaster } from "@/components/ui/toaster";
 
-export default function FarmProfileForm() {
+type FarmProfileFormProps = {
+  setIsFormActive: (isActive: boolean) => void;
+};
+
+export default function FarmProfileForm({
+  setIsFormActive,
+}: FarmProfileFormProps) {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
@@ -44,9 +51,9 @@ export default function FarmProfileForm() {
   const [validationErrors, setValidationErrors] = useState<
     { path: string; message: string }[]
   >([]);
-  const [isFormComplete, setIsFormComplete] = useState(false);
+  const router = useRouter();
 
-  // Initial form state with type safety
+  // Initial form state with type safety aligned with FarmProfileData
   const [formData, setFormData] = useState<Partial<FarmProfileData>>({
     farmName: "",
     farmLocation: "",
@@ -57,22 +64,50 @@ export default function FarmProfileForm() {
     contactPhone: "",
     gender: Gender.Male,
     farmType: FarmType.Mixed,
-    cropFarmingType: CropFarmingType.Mixed,
-    primaryCropsOrLivestock: [],
     belongsToCooperative: false,
+
+    // Optional arrays for different farm types
+    cropsGrown: [],
+    livestockProduced: [],
+    mixedCropsGrown: [],
   });
 
-  const totalSections = 5;
+  const totalSections = 4;
 
-  // Effect to handle current profile changes
   useEffect(() => {
-    if (currentProfile) {
-      // Safely update form data from current profile
-      setFormData(currentProfile);
+    // Only populate form data if we're updating an existing profile
+    if (currentProfile?._id) {
+      const completeProfileData: Partial<FarmProfileData> = {
+        ...currentProfile,
+        // Ensure all arrays are initialized
+        cropsGrown: currentProfile.cropsGrown || [],
+        livestockProduced: currentProfile.livestockProduced || [],
+        mixedCropsGrown: currentProfile.mixedCropsGrown || [],
+        farmSize: currentProfile.farmSize || 0,
+        belongsToCooperative: currentProfile.belongsToCooperative ?? false,
+      };
+
+      setFormData(completeProfileData);
+    } else {
+      // Reset to initial empty state when creating a new profile
+      setFormData({
+        farmName: "",
+        farmLocation: "",
+        farmSize: 0,
+        productionScale: ProductionScale.Small,
+        ownershipStatus: OwnershipStatus.Owned,
+        fullName: "",
+        contactPhone: "",
+        gender: Gender.Male,
+        farmType: FarmType.Mixed,
+        belongsToCooperative: false,
+        cropsGrown: [],
+        livestockProduced: [],
+        mixedCropsGrown: [],
+      });
     }
   }, [currentProfile]);
 
-  // Effect to handle errors
   useEffect(() => {
     if (error) {
       toast({
@@ -83,51 +118,18 @@ export default function FarmProfileForm() {
     }
   }, [error]);
 
-  // Update specific section of form data
   const updateFormSection = (sectionData: Partial<FarmProfileData>) => {
     const updatedFormData = {
       ...formData,
       ...sectionData,
     };
+
+    // Ensure arrays are initialized
+    updatedFormData.cropsGrown = updatedFormData.cropsGrown || [];
+    updatedFormData.livestockProduced = updatedFormData.livestockProduced || [];
+    updatedFormData.mixedCropsGrown = updatedFormData.mixedCropsGrown || [];
+
     setFormData(updatedFormData);
-
-    // Check if all required fields are filled
-    checkFormCompleteness(updatedFormData);
-  };
-
-  // Check form completeness
-  const checkFormCompleteness = (data: Partial<FarmProfileData>) => {
-    const requiredFields: (keyof FarmProfileData)[] = [
-      "farmName",
-      "farmLocation",
-      "farmSize",
-      "productionScale",
-      "ownershipStatus",
-      "fullName",
-      "contactPhone",
-      "gender",
-      "farmType",
-      "cropFarmingType",
-      "primaryCropsOrLivestock",
-      "belongsToCooperative",
-    ];
-
-    const isComplete = requiredFields.every((field) => {
-      const value = data[field];
-
-      // Check for non-empty strings, non-zero numbers, and non-empty arrays
-      if (typeof value === "string") return value.trim() !== "";
-      if (typeof value === "number") return value !== 0;
-      if (Array.isArray(value)) return value.length > 0;
-      return value !== undefined && value !== null;
-    });
-
-    setIsFormComplete(isComplete);
-  };
-
-  // Page navigation handler
-  const handlePageChange = (sectionId: number) => {
-    setCurrentSection(sectionId);
   };
 
   // Form submission handler
@@ -143,24 +145,15 @@ export default function FarmProfileForm() {
       return;
     }
 
-    if (!isFormComplete) {
-      toast({
-        title: "Incomplete Form",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      // Add userId to form data
       const profileData: FarmProfileData = {
-        userId,
         ...formData,
+        userId,
       } as FarmProfileData;
 
-      if (currentProfile && currentProfile._id) {
-        await dispatch(
+      let response;
+      if (currentProfile?._id) {
+        response = await dispatch(
           updateFarmProfile({
             id: currentProfile._id,
             profileData,
@@ -171,31 +164,40 @@ export default function FarmProfileForm() {
           title: "Success",
           description: "Farm profile updated successfully",
         });
+        setIsFormActive(false);
+        window.location.reload();
       } else {
-        // Create new profile
-        await dispatch(createFarmProfile(profileData)).unwrap();
-
+        // Creating new profile
+        response = await dispatch(createFarmProfile(profileData)).unwrap();
         toast({
           title: "Success",
           description: "Farm profile created successfully",
         });
+        router.push(`/profile/shared_profile`);
       }
 
       // Reset validation errors
       setValidationErrors([]);
-      setIsFormComplete(false);
-    } catch (err: any) {
-      // Handle validation errors
-      if (Array.isArray(err)) {
-        setValidationErrors(err);
-      }
+    } catch (error) {
+      console.error("Submission Error:", error);
 
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       toast({
         title: "Submission Error",
-        description: "Please check the form for errors",
+        description: errorMessage || "Please check the form for errors",
         variant: "destructive",
       });
+
+      if (Array.isArray(error)) {
+        setValidationErrors(error);
+      }
     }
+  };
+
+  // Page navigation handler
+  const handlePageChange = (sectionId: number) => {
+    setCurrentSection(sectionId);
   };
 
   const renderPaginationLinks = () => {
@@ -226,18 +228,15 @@ export default function FarmProfileForm() {
               formData={formData}
               updateFormSection={updateFormSection}
             />
-          </div>
-        );
-      case 2:
-        return (
-          <div className="space-y-4">
+
             <FarmerOwnerInformationSection
               formData={formData}
               updateFormSection={updateFormSection}
             />
           </div>
         );
-      case 3:
+
+      case 2:
         return (
           <div className="space-y-4">
             <FarmTypeSection
@@ -246,7 +245,7 @@ export default function FarmProfileForm() {
             />
           </div>
         );
-      case 4:
+      case 3:
         return (
           <div className="space-y-4">
             <CooperativeInformationSection
@@ -255,7 +254,7 @@ export default function FarmProfileForm() {
             />
           </div>
         );
-      case 5:
+      case 4:
         return renderSubmissionSection();
       default:
         return null;
@@ -264,7 +263,7 @@ export default function FarmProfileForm() {
 
   // Submission review section
   const renderSubmissionSection = () => (
-    <Card className="w-full max-w-xl mx-auto">
+    <Card className="w-full">
       <CardContent className="p-6 space-y-4">
         <div className="flex items-start space-x-4 p-4 rounded-lg">
           <Info className="text-blue-600 flex-shrink-0 mt-1" size={24} />
@@ -297,18 +296,12 @@ export default function FarmProfileForm() {
             Profile data collected in {totalSections - 1} sections
           </span>
         </div>
-
-        {!isFormComplete && (
-          <div className="text-yellow-700 text-sm">
-            Please ensure all required fields are filled
-          </div>
-        )}
       </CardContent>
 
       <CardFooter>
         <Button
           onClick={handleSubmit}
-          disabled={loading || !isFormComplete}
+          disabled={loading}
           className="w-full flex items-center justify-center"
           variant="outline"
         >
@@ -329,7 +322,7 @@ export default function FarmProfileForm() {
   );
 
   return (
-    <div className="w-full h-auto rounded-md p-6">
+    <div className="w-full h-full bg-gray-300/50 rounded-md p-2">
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <h2 className="text-xl font-bold mb-4">

@@ -1,5 +1,16 @@
 import React, { useState } from "react";
-import { MapPin, Ruler, Scale, Images, Map, Tractor, X } from "lucide-react";
+import {
+  MapPin,
+  Ruler,
+  Scale,
+  Images,
+  Map,
+  Tractor,
+  X,
+  Building, // Added for Farm Name
+  Navigation, // Added for GPS Address
+  Trees, // Added for Nearby Landmarks
+} from "lucide-react";
 import { FarmProfileData } from "@/store/type/formtypes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -40,7 +51,10 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
       <div className="space-y-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <div className="flex items-center justify-between border-b pb-3">
           <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
-            <Tractor className="mr-3 text-primary" size={24} />
+            <Tractor
+              className="mr-3 text-emerald-600 dark:text-emerald-400"
+              size={18}
+            />
             Farm Details
           </h3>
         </div>
@@ -49,7 +63,10 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
           {/* Primary Farm Information */}
           <div className="space-y-4">
             <div className="flex items-center">
-              <MapPin className="mr-3 text-primary/70" size={20} />
+              <Building
+                className="mr-3 text-blue-600 dark:text-blue-400"
+                size={18}
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
                   Farm Name
@@ -61,7 +78,10 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
             </div>
 
             <div className="flex items-center">
-              <Map className="mr-3 text-primary/70" size={20} />
+              <Map
+                className="mr-3 text-green-600 dark:text-green-400"
+                size={18}
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
                   Location
@@ -74,7 +94,10 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
 
             {profile.gpsAddress && (
               <div className="flex items-center">
-                <MapPin className="mr-3 text-primary/70" size={20} />
+                <Navigation
+                  className="mr-3 text-purple-600 dark:text-purple-400"
+                  size={18}
+                />
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
                     GPS Address
@@ -90,7 +113,10 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
           {/* Secondary Farm Information */}
           <div className="space-y-4">
             <div className="flex items-center">
-              <Ruler className="mr-3 text-primary/70" size={20} />
+              <Ruler
+                className="mr-3 text-indigo-600 dark:text-indigo-400"
+                size={18}
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
                   Farm Size
@@ -102,7 +128,10 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
             </div>
 
             <div className="flex items-center">
-              <Scale className="mr-3 text-primary/70" size={20} />
+              <Scale
+                className="mr-3 text-red-600 dark:text-red-400"
+                size={18}
+              />
               <div>
                 <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
                   Production Scale
@@ -115,7 +144,10 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
 
             {profile.nearbyLandmarks && profile.nearbyLandmarks.length > 0 && (
               <div className="flex items-start">
-                <MapPin className="mr-3 text-primary/70" size={20} />
+                <Trees
+                  className="mr-3 text-amber-600 dark:text-amber-400"
+                  size={18}
+                />
                 <div>
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-400">
                     Nearby Landmarks
@@ -136,7 +168,10 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
         {profile.farmImages && profile.farmImages.length > 0 && (
           <div className="mt-6">
             <div className="flex items-center border-t pt-4">
-              <Images className="mr-3 text-primary/70" size={20} />
+              <Images
+                className="mr-3 text-cyan-600 dark:text-cyan-400"
+                size={18}
+              />
               <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Farm Images
               </h4>
@@ -145,7 +180,7 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
               {profile.farmImages.map((image, index) => (
                 <div
                   key={index}
-                  className="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden cursor-pointer"
+                  className="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
                   onClick={() => setIsCarouselOpen(true)}
                 >
                   <Avatar className="w-full h-full object-cover rounded-lg">
@@ -174,7 +209,7 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
                 variant={"ghost"}
                 size={"icon"}
               >
-                <X size={20} />
+                <X size={18} />
               </Button>
               <Carousel
                 plugins={[
@@ -194,7 +229,7 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
                       key={index}
                       className="flex justify-center items-center"
                     >
-                      <Avatar className="w-[50vh] h-[50vh] object-contain rounded-lg">
+                      <Avatar className="w-[30vh] h-[30vh] sm:w-[40vh] sm:h-[40vh] md:w-[50vh] md:h-[50vh] lg:w-[60vh] lg:h-[60vh] object-contain rounded-lg">
                         <AvatarImage
                           src={image.url}
                           alt={`Farm image ${index + 1}`}
@@ -204,6 +239,7 @@ const FarmInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
                     </CarouselItem>
                   ))}
                 </CarouselContent>
+
                 <CarouselPrevious className="text-white bg-white/20 hover:bg-white/40" />
                 <CarouselNext className="text-white bg-white/20 hover:bg-white/40" />
               </Carousel>

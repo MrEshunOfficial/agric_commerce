@@ -25,3 +25,47 @@
 * Name of the Group
 * Name and contact of one group executive, President or secretary.
 * Name and contact of the Nearest Agric. Officer.
+
+
+// post form items
+farms = [
+    {
+      description: "Farm 1 description",
+      image:
+        "https://images.pexels.com/photos/3963167/pexels-photo-3963167.jpeg?auto=compress&cs=tinysrgb&w=600",
+      additional_images: [
+        "https://images.pexels.com/photos/14482359/pexels-photo-14482359.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/7611893/pexels-photo-7611893.jpeg?auto=compress&cs=tinysrgb&w=600",
+      ],
+      harvest_details: {
+        quantity: 500,
+        unit: "kg",
+        harvest_date: "2024-12-01",
+        quality_grade: "Grade A",
+      },
+      pricing: {
+        price_per_unit: "$10",
+        negotiable: true,
+        bulk_discount: "5% for orders above 100 kg",
+      },
+      availability: {
+        available_until: "2025-01-01",
+        status: "available",
+      },
+      logistics: {
+        delivery_available: true,
+        delivery_condition: "10 miles away from location",
+        delivery_cost: "negotiable",
+      },
+      contact: {
+        posted_by: "John Doe",
+        contact_number: "+1234567890",
+        email: "john.doe@example.com",
+        posted_at: new Date(),
+      },
+      ratings: {
+        farmer_rating: 4.5,
+        total_ratings: 100,
+      },
+    },
+  ],

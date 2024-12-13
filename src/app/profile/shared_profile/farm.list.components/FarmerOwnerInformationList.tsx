@@ -7,7 +7,7 @@ const FarmerInformationDetails: React.FC<{ profile: FarmProfileData }> = ({
   profile,
 }) => {
   return (
-    <div className="space-y-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <div className="w-full space-y-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       <div className="flex items-center justify-between border-b pb-3">
         <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
           <User className="mr-3 text-primary" size={24} />

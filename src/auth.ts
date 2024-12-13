@@ -34,7 +34,7 @@ declare module 'next-auth' {
 }
 
 const publicPaths: string[] = ['/', '/authclient/Register', '/authclient/Login'];
-const privatePaths: string[] = ['/profile'];
+const privatePaths: string[] = ['/profile/shared_profile'];
 
 interface CustomToken extends JWT {
   id?: string;
@@ -135,7 +135,7 @@ export const authOptions: NextAuthConfig = {
       // Handle public paths
       if (publicPaths.some(p => path.startsWith(p))) {
         if (isLoggedIn) {
-          return Response.redirect(new URL('/profile', nextUrl));
+          return Response.redirect(new URL('/profile/shared_profile', nextUrl));
         }
         return true;
       }
@@ -152,7 +152,7 @@ export const authOptions: NextAuthConfig = {
       // Handle root path
       if (path === '/') {
         return isLoggedIn
-          ? Response.redirect(new URL('/profile', nextUrl))
+          ? Response.redirect(new URL('/profile/shared_profile', nextUrl))
           : Response.redirect(new URL('/authclient/Login', nextUrl));
       }
 
@@ -238,7 +238,7 @@ export const authOptions: NextAuthConfig = {
     async redirect({ url, baseUrl }) {
       // Special case for Google OAuth callback
       if (url.startsWith('/api/auth/callback/google')) {
-        return `${baseUrl}/profile`;
+        return `${baseUrl}/profile/shared_profile`;
       }
 
       // Handle sign-out redirects
@@ -248,14 +248,14 @@ export const authOptions: NextAuthConfig = {
       
       // Handle callback redirects
       if (url.startsWith('/api/auth/callback')) {
-        return `${baseUrl}/profile`;
+        return `${baseUrl}/profile/shared_profile`;
       }
 
       // Handle relative URLs
       if (url.startsWith('/')) {
         // If it's the home page, redirect based on auth status
         if (url === '/') {
-          return `${baseUrl}/profile`;
+          return `${baseUrl}/profile/shared_profile`;
         }
         return `${baseUrl}${url}`;
       }
@@ -266,7 +266,7 @@ export const authOptions: NextAuthConfig = {
       }
       
       // Default fallback
-      return `${baseUrl}/profile`;
+      return `${baseUrl}/profile/shared_profile`;
     }
   },
 };

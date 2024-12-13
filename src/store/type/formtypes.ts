@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Existing enums from previous implementation
 export const OwnershipStatus = {
   Owned: 'Owned',
   Leased: 'Leased',
@@ -12,24 +11,10 @@ export const FarmType = {
   CropFarming: 'Crop Farming',
   LivestockFarming: 'Livestock Farming',
   Mixed: 'Mixed',
-  Aquaculture: 'Aquaculture'
-} as const;
-
-export const CropFarmingType = {
-  Mixed: 'Mixed',
-  Arable: 'Arable', 
-  Horticulture: 'Horticulture',
-  Perennial: 'Perennial',
-  Hydroponic: 'Hydroponic'
-} as const;
-
-export const LivestockType = {
-  Mixed: 'Mixed',
-  Dairy: 'Dairy',
+  Aquaculture: 'Aquaculture',
+  Nursery: 'Nursery',
   Poultry: 'Poultry',
-  CattleRanching: 'Cattle Ranching',
-  PigFarming: 'Pig Farming',
-  Beekeeping: 'Beekeeping'
+  Others: 'Others',
 } as const;
 
 export const ProductionScale = {
@@ -48,38 +33,57 @@ export const Gender = {
 // Type Definitions
 export type OwnershipStatusType = keyof typeof OwnershipStatus;
 export type FarmTypeType = keyof typeof FarmType;
-export type CropFarmingTypeType = keyof typeof CropFarmingType;
-export type LivestockTypeType = keyof typeof LivestockType;
 export type ProductionScaleType = keyof typeof ProductionScale;
 export type GenderType = keyof typeof Gender;
 
 // Interfaces
 export interface FarmProfileData {
-  _id?: string;
+  _id: string;
   userId: string;
+  
+  // Additional Farm Details
+  farmDescription?: string;
+  farmFoundedYear?: number;
+  totalLandArea?: number;
+  irrigatedLandArea?: number;
+  
   farmName: string;
   farmLocation: string;
   nearbyLandmarks?: string[];
   gpsAddress?: string;
-  farmSize: number; // in acres
-  productionScale: ProductionScaleType;
-  farmImages?: {
+  farmSize: number;
+  productionScale: typeof ProductionScale[keyof typeof ProductionScale];
+  farmImages?: Array<{
     url: string;
     fileName: string;
-  }[];
+  }>;
 
   // 2. Farmer Owner Information
-  ownershipStatus: OwnershipStatusType;
+  ownershipStatus: typeof OwnershipStatus[keyof typeof OwnershipStatus];
   fullName: string;
   contactPhone: string;
   contactEmail?: string;
-  gender: GenderType;
+  gender: typeof Gender[keyof typeof Gender];
+  
+  // Additional Personal Details
+  dateOfBirth?: string;
+  educationLevel?: string;
+  primaryOccupation?: string;
 
   // 3. Farm Type
-  farmType: FarmTypeType;
-  cropFarmingType?: CropFarmingTypeType;
-  livestockType?: LivestockTypeType;
-  primaryCropsOrLivestock: string[];
+  farmType: typeof FarmType[keyof typeof FarmType];
+  cropsGrown?: string[];
+  livestockProduced?: string[];
+  mixedCropsGrown?: string[];
+  aquacultureType?: string[];
+  nurseryType?: string[];
+  poultryType?: string[];
+  othersType?: string[];
+
+  primaryCrop?: string;
+  primaryLivestock?: string;
+  annualCropYield?: number;
+  livestockCount?: number;
 
   // 4. Groups and Cooperative Information
   belongsToCooperative: boolean;
@@ -95,12 +99,24 @@ export interface FarmProfileData {
     phone: string;
     email?: string;
   };
+
+  // Additional Financial and Support Information
+  primaryIncome?: string;
+  secondaryIncome?: string;
+  governmentSupport?: boolean;
+  supportType?: string;
 }
 
 // Zod Schemas for Validation
 export const FarmProfileFormSchema = z.object({
-  _id: z.string().optional(),
   userId: z.string(),
+  
+  // Optional Extended Information
+  farmDescription: z.string().optional(),
+  farmFoundedYear: z.number().int().min(1900).max(new Date().getFullYear()).optional(),
+  totalLandArea: z.number().positive().optional(),
+  irrigatedLandArea: z.number().nonnegative().optional(),
+  
   farmName: z.string().min(2, "Farm name must be at least 2 characters"),
   farmLocation: z.string().min(5, "Farm location must be at least 5 characters"),
   nearbyLandmarks: z.array(z.string()).optional(),
@@ -120,12 +136,27 @@ export const FarmProfileFormSchema = z.object({
   contactPhone: z.string().min(10, "Phone number is required"),
   contactEmail: z.string().email().optional(),
   gender: z.enum(Object.values(Gender) as [GenderType, ...GenderType[]]),
+  
+  // Additional Personal Details
+  dateOfBirth: z.string().optional(),
+  educationLevel: z.string().optional(),
+  primaryOccupation: z.string().optional(),
 
   // 3. Farm Type
   farmType: z.enum(Object.values(FarmType) as [FarmTypeType, ...FarmTypeType[]]),
-  cropFarmingType: z.enum(Object.values(CropFarmingType) as [CropFarmingTypeType, ...CropFarmingTypeType[]]).optional(),
-  livestockType: z.enum(Object.values(LivestockType) as [LivestockTypeType, ...LivestockTypeType[]]).optional(),
-  primaryCropsOrLivestock: z.array(z.string()).min(1, "At least one crop or livestock type must be specified"),
+  cropsGrown: z.array(z.string()).optional(),
+  livestockProduced: z.array(z.string()).optional(),
+  mixedCropsGrown: z.array(z.string()).optional(),
+  aquacultureType: z.array(z.string()).optional(),
+  nurseryType: z.array(z.string()).optional(),
+  poultryType: z.array(z.string()).optional(),
+  othersType: z.array(z.string()).optional(),
+
+  // Expanded Crop and Livestock Information
+  primaryCrop: z.string().optional(),
+  primaryLivestock: z.string().optional(),
+  annualCropYield: z.number().positive().optional(),
+  livestockCount: z.number().nonnegative().optional(),
 
   // 4. Groups and Cooperative Information
   belongsToCooperative: z.boolean(),
@@ -140,10 +171,14 @@ export const FarmProfileFormSchema = z.object({
     name: z.string().min(2, "Agricultural officer name is required"),
     phone: z.string().min(10, "Phone number is required"),
     email: z.string().email().optional()
-  }).optional()
+  }).optional(),
+
+  // Additional Financial and Support Information
+  primaryIncome: z.string().optional(),
+  secondaryIncome: z.string().optional(),
+  governmentSupport: z.boolean().optional(),
+  supportType: z.string().optional()
 }).superRefine((data, ctx) => {
-  // Conditional Validations
-  
   // Cooperative Information Validation
   if (data.belongsToCooperative) {
     if (!data.cooperativeName) {
@@ -162,23 +197,6 @@ export const FarmProfileFormSchema = z.object({
     }
   }
 
-  // Farm Type Specific Validations
-  if (data.farmType === "CropFarming" && !data.cropFarmingType) {
-    ctx.addIssue({
-      code: "custom",
-      message: "Crop farming type must be specified for crop farming",
-      path: ["cropFarmingType"]
-    });
-  }
-
-  if (data.farmType === "LivestockFarming" && !data.livestockType) {
-    ctx.addIssue({
-      code: "custom",
-      message: "Livestock type must be specified for livestock farming",
-      path: ["livestockType"]
-    });
-  }
-
   // Contact Information Validation
   if (!data.contactPhone && !data.contactEmail) {
     ctx.addIssue({
@@ -188,21 +206,3 @@ export const FarmProfileFormSchema = z.object({
     });
   }
 });
-
-// Validation Function
-// Validation Function remains the same
-export function validateFarmProfileForm(data: unknown): FarmProfileData {
-  try {
-    return FarmProfileFormSchema.parse(data);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const formattedErrors = error.errors.map(err => ({
-        path: err.path.join('.'),
-        message: err.message
-      }));
-      
-      throw new Error(JSON.stringify(formattedErrors));
-    }
-    throw error;
-  }
-}

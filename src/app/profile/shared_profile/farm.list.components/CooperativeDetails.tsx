@@ -1,5 +1,5 @@
 import React from "react";
-import { Users, UserCheck, Phone, Mail, Briefcase } from "lucide-react";
+import { Users, UserCheck, Phone, Briefcase } from "lucide-react";
 import { FarmProfileData } from "@/store/type/formtypes";
 
 const CooperativeDetails: React.FC<{ profile: FarmProfileData }> = ({
@@ -24,7 +24,7 @@ const CooperativeDetails: React.FC<{ profile: FarmProfileData }> = ({
   }
 
   return (
-    <div className="space-y-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+    <div className="w-full space-y-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       <div className="flex items-center justify-between border-b pb-3">
         <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
           <Users className="mr-3 text-primary" size={24} />

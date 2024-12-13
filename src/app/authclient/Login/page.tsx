@@ -89,7 +89,7 @@ export default function Login() {
           description: "Invalid credentials. Please try again.",
         });
       } else {
-        router.push("/profile");
+        router.push("/profile/shared_profile");
         toast({
           title: "Success",
           description: "Successfully logged in!",
