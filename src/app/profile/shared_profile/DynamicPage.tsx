@@ -55,7 +55,7 @@ export const DynamicPage: React.FC<DynamicPageProps> = ({ filteredFarms }) => {
           </p>
           <Button variant="default" className="w-full">
             <Link
-              href="/profile/shared_profile/farm.profile.form"
+              href="/profile/shared_profile/farmProfileForm"
               className="w-full h-full"
             >
               Add a Farm
