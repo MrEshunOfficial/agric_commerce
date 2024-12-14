@@ -36,7 +36,9 @@ type FarmProfileFormProps = {
   setIsFormActive: (isActive: boolean) => void;
 };
 
-const FarmProfileForm: React.FC<FarmProfileFormProps> = (props) => {
+const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
+  setIsFormActive,
+}) => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
@@ -162,7 +164,7 @@ const FarmProfileForm: React.FC<FarmProfileFormProps> = (props) => {
           title: "Success",
           description: "Farm profile updated successfully",
         });
-        props.setIsFormActive(false);
+        setIsFormActive(false);
         window.location.reload();
       } else {
         // Creating new profile
