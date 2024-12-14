@@ -32,13 +32,7 @@ import {
   ProductionScale,
 } from "@/store/type/formtypes";
 
-type FarmProfileFormProps = {
-  setIsFormActive: (isActive: boolean) => void;
-};
-
-const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
-  setIsFormActive,
-}) => {
+const FarmProfileForm = () => {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
@@ -164,8 +158,6 @@ const FarmProfileForm: React.FC<FarmProfileFormProps> = ({
           title: "Success",
           description: "Farm profile updated successfully",
         });
-        setIsFormActive(false);
-        window.location.reload();
       } else {
         // Creating new profile
         response = await dispatch(createFarmProfile(profileData)).unwrap();

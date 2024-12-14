@@ -31,10 +31,8 @@ import FarmInformationDetails from "../farm.list.components/FarmInformationList"
 import FarmerInformationDetails from "../farm.list.components/FarmerOwnerInformationList";
 import CooperativeDetails from "../farm.list.components/CooperativeDetails";
 import Link from "next/link";
-import FarmProfileForm from "../farm.profile.form/page";
 
 export default function FarmDetailsPage() {
-  const [isFormActive, setIsFormActive] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -90,9 +88,6 @@ export default function FarmDetailsPage() {
             profileData: currentProfile,
           })
         ).unwrap();
-
-        setIsFormActive(true);
-
         toast({
           title: "Profile Ready for Editing",
           description: "Your farm profile is now in edit mode",
@@ -324,26 +319,22 @@ export default function FarmDetailsPage() {
                         </AlertDialog>
                       </motion.div>
                     </TabsList>
-                    {!isFormActive ? (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="w-full"
-                      >
-                        <TabsContent value="farmInfo" className="w-full">
-                          <FarmInformationDetails profile={currentProfile} />
-                        </TabsContent>
-                        <TabsContent value="farmerInfo" className="w-full">
-                          <FarmerInformationDetails profile={currentProfile} />
-                        </TabsContent>
-                        <TabsContent value="cooperative" className="w-full">
-                          <CooperativeDetails profile={currentProfile} />
-                        </TabsContent>
-                      </motion.div>
-                    ) : (
-                      <FarmProfileForm setIsFormActive={setIsFormActive} />
-                    )}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="w-full"
+                    >
+                      <TabsContent value="farmInfo" className="w-full">
+                        <FarmInformationDetails profile={currentProfile} />
+                      </TabsContent>
+                      <TabsContent value="farmerInfo" className="w-full">
+                        <FarmerInformationDetails profile={currentProfile} />
+                      </TabsContent>
+                      <TabsContent value="cooperative" className="w-full">
+                        <CooperativeDetails profile={currentProfile} />
+                      </TabsContent>
+                    </motion.div>
                   </Tabs>
                 </div>
               </div>
