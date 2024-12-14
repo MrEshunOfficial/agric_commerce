@@ -19,10 +19,6 @@ import { useSession } from "next-auth/react";
 // Import actions and types
 import { createFarmProfile, updateFarmProfile } from "@/store/farmSlice";
 import { Toaster } from "@/components/ui/toaster";
-import FarmInformationSection from "../farm.forms.components/FarmInformationSection";
-import FarmerOwnerInformationSection from "../farm.forms.components/FarmerOwnerInformationSection";
-import FarmTypeSection from "../farm.forms.components/FarmTypeSection";
-import CooperativeInformationSection from "../farm.forms.components/CooperativeInformationSection";
 import { useRouter } from "next/navigation";
 import {
   FarmProfileData,
@@ -31,6 +27,10 @@ import {
   OwnershipStatus,
   ProductionScale,
 } from "@/store/type/formtypes";
+import FarmInformationSection from "../shared_profile/farm.forms.components/FarmInformationSection";
+import FarmerOwnerInformationSection from "../shared_profile/farm.forms.components/FarmerOwnerInformationSection";
+import FarmTypeSection from "../shared_profile/farm.forms.components/FarmTypeSection";
+import CooperativeInformationSection from "../shared_profile/farm.forms.components/CooperativeInformationSection";
 
 const FarmProfileForm = () => {
   const { data: session } = useSession();

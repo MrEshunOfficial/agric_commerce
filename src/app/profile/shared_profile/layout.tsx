@@ -244,7 +244,7 @@ const DynamicNav: React.FC<DynamicNavProps> = ({
             <CardContent className="w-full flex items-center justify-center p-2">
               <Button className="w-full" variant={"link"}>
                 <Link
-                  href={"/profile/shared_profile/farmProfileForm"}
+                  href={"/profile/FarmProfileForm"}
                   className="w-full"
                   onClick={onClose}
                 >

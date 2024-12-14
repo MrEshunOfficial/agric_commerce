@@ -74,7 +74,7 @@ export default function FarmDetailsPage() {
           description: "The specified farm profile does not exist.",
           variant: "destructive",
         });
-        router.push("/profile/farmer_profile/farm.profile.form"); // Redirect to farms list
+        router.push("/profile/FarmProfileForm");
       }
     }
   }, [farmProfiles, farmId, dispatch, router]);
