@@ -11,7 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { ScrollArea } from "@/components/ui/scroll-area"; // Import Scroll Area
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { fetchPostedAds } from "@/store/postSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
@@ -55,15 +55,29 @@ const PostedFarms = () => {
   // Error state handling
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-full w-full p-4 sm:p-6 bg-red-50">
-        <AlertCircle className="text-red-500 w-12 sm:w-16 h-12 sm:h-16 mb-2 sm:mb-4" />
-        <h2 className="text-lg sm:text-xl font-semibold text-red-700 mb-1 sm:mb-2">
-          Unable to Load Farms
-        </h2>
-        <p className="text-sm sm:text-base text-red-600 text-center px-2 sm:px-0">
-          There was an issue retrieving your farm listings. Please try again
-          later or contact support.
-        </p>
+      <div className="flex items-center justify-center h-full w-full p-4 bg-red-50">
+        <div className="text-center">
+          <AlertCircle className="mx-auto mb-4 text-red-500 w-12 h-12" />
+          <p className="text-lg text-red-700 mb-2">
+            {typeof error === "string"
+              ? error
+              : (error as Error).message
+              ? (error as Error).message
+              : "An unknown error occurred"}
+          </p>
+          {error && typeof error === "object" && "details" in error && (
+            <details className="text-sm text-gray-600 mt-2">
+              <summary>Error Details</summary>
+              <pre className="bg-gray-100 p-2 rounded-md overflow-x-auto">
+                {JSON.stringify(
+                  (error as { details: unknown }).details,
+                  null,
+                  2
+                )}
+              </pre>
+            </details>
+          )}
+        </div>
       </div>
     );
   }
@@ -77,7 +91,7 @@ const PostedFarms = () => {
           No Farms Posted
         </h2>
         <p className="text-sm sm:text-base text-gray-600 text-center mb-2 sm:mb-4 px-2 sm:px-0">
-          {` You haven't posted any farm listings yet.`}
+          {`You haven't posted any farm listings yet.`}
         </p>
         <Link
           href="/create-farm"

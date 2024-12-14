@@ -1,7 +1,7 @@
 import type { NextAuthConfig } from 'next-auth';
 
 // Define public and private paths
-const publicPaths = ['/', '/authclient/Register', '/authclient/Login'];
+const publicPaths = ['/authclient/Register', '/authclient/Login'];
 const privatePaths: string[] = ['/profile/shared_profile'];
 
 // Extend the Session and JWT types to include sessionId

@@ -215,7 +215,7 @@ const ProfileList: React.FC = () => {
 
   if (loading === "pending") return <ProfileListLoader />;
   if (error) return <ProfileListError message={error} />;
-  if (profiles.length === 0) return <EmptyProfileList />;
+  if (!profiles || profiles.length === 0) return <EmptyProfileList />;
 
   return (
     <>
